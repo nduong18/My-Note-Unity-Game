@@ -1,0 +1,108 @@
+Tuyệt! Dưới đây là phần giải thích rõ ràng về **`Update()` trong Unity**, kèm ví dụ cụ thể và dễ hiểu 👇
+
+---
+
+## ✅ `Update()` dùng khi nào?
+
+### `Update()` là hàm chạy **mỗi frame hiển thị** của game (tùy thuộc vào FPS của máy)
+
+---
+
+### 📌 Dùng `Update()` khi:
+
+1. **Đọc input từ người chơi**  
+   - `Input.GetKeyDown`, `Input.GetAxis`, `Input.GetMouseButtonDown`, v.v.
+   - Input thay đổi theo thời gian thực → cần cập nhật từng frame
+
+2. **Xử lý logic không liên quan đến vật lý**  
+   - Animation, UI, thời gian, trigger event
+   - Gán hiệu ứng, chơi nhạc, thay đổi trạng thái
+
+3. **Gọi hàm hoạt động theo thời gian**  
+   - Ví dụ như đếm ngược thời gian, cooldown kỹ năng
+
+---
+
+## 🧠 Tại sao không dùng `FixedUpdate()` cho input?
+
+Vì `FixedUpdate()` chạy theo thời gian vật lý (thường là 50 lần/giây), chậm hơn `Update()`. Nếu bạn nhấn phím rất nhanh, `FixedUpdate()` có thể **bỏ lỡ** việc bạn đã nhấn.
+
+---
+
+## 🔍 Ví dụ cụ thể với `Update()`
+
+### 1. **Đọc phím nhảy và lưu trạng thái:**
+
+```csharp
+private bool jumpPressed = false;
+
+void Update()
+{
+    // Nhan phim space de nhay
+    if (Input.GetKeyDown(KeyCode.Space))
+    {
+        jumpPressed = true;
+    }
+}
+```
+
+→ Sau đó xử lý nhảy ở `FixedUpdate()`:
+
+```csharp
+void FixedUpdate()
+{
+    if (isGrounded && jumpPressed)
+    {
+        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+    }
+
+    // Reset sau khi nhay
+    jumpPressed = false;
+}
+```
+
+---
+
+### 2. **Thay đổi animation theo trạng thái:**
+
+```csharp
+void Update()
+{
+    if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow))
+    {
+        anim.SetBool("isRunning", true);
+    }
+    else
+    {
+        anim.SetBool("isRunning", false);
+    }
+}
+```
+
+---
+
+### 3. **Tăng thời gian đếm ngược từng frame:**
+
+```csharp
+private float timer = 5f;
+
+void Update()
+{
+    timer -= Time.deltaTime;
+
+    if (timer <= 0)
+    {
+        Debug.Log("Het gio!");
+    }
+}
+```
+
+---
+
+## ✅ Tóm tắt ngắn gọn:
+
+| Dùng `Update()` khi bạn cần...              | Vì sao?                            |
+|---------------------------------------------|-------------------------------------|
+| Đọc input từ người chơi                     | Chính xác hơn, không bị trễ         |
+| Giao diện, animation, trigger không vật lý  | Không cần đồng bộ vật lý            |
+| Xử lý logic phụ thuộc vào thời gian thực    | Chạy theo frame → mượt              |
